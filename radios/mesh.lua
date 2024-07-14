@@ -8,10 +8,10 @@ header_window.setBackgroundColor(colors.pink)
 header_window.setTextColor(colors.black)
 header_window.clear()
 header_window.setCursorPos(1, 1)
-header_window.write("[MESH by @breqdev] connected as " .. callsign)
+header_window.write("[MESH] " .. callsign)
 
-local recv_window = window.create(term.current(), 1, 2, width, height - 4)
-local send_window = window.create(term.current(), 1, height - 3, width, 3)
+local recv_window = window.create(term.current(), 1, 2, width, height - 2)
+local send_window = window.create(term.current(), 1, height, width, 1)
 
 local known_messages = {}
 

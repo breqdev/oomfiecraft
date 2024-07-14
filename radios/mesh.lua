@@ -33,8 +33,7 @@ function print_message(callsigns, message)
     recv_window.setTextColor(colors.lightGray)
     recv_window.write("] ")
     recv_window.setTextColor(colors.white)
-    recv_window.write(message)
-    recv_window.write("\n")
+    print(message)
 
     term.redirect(old)
 end

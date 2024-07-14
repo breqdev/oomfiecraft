@@ -3,8 +3,15 @@ callsign = "K9BRQ"
 local modem = rednet.open("back")
 local width, height = term.getSize()
 
-local recv_window = window.create(term.current(), 1, 1, width, height - 3)
-local send_window = window.create(term.current(), 1, height - 3, width, height - 3)
+local header_window = window.create(term.current(), 1, 1, width, 1)
+header_window.setBackgroundColor(colors.pink)
+header_window.setTextColor(colors.black)
+header_window.clear()
+header_window.setCursorPos(1, 1)
+header_window.write("[MESH by @breqdev] connected as " .. callsign)
+
+local recv_window = window.create(term.current(), 1, 2, width, height - 4)
+local send_window = window.create(term.current(), 1, height - 3, width, 3)
 
 local known_messages = {}
 

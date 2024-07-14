@@ -8,11 +8,30 @@ local send_window = window.create(term.current(), 1, height - 3, width, height -
 
 local known_messages = {}
 
+function print_message(callsigns, message)
+    -- separate callsign history into first, rest
+    local sender_callsign, via_callsigns = callsigns:match("(%S+)%s(.*)")
+
+    -- print message
+    recv_window.blit("[", colors.lightGray, colors.black)
+    recv_window.blit(sender_callsign, colors.orange, colors.black)
+
+    if via_callsigns ~= "" then
+        recv_window.blit(" via ", colors.lightGray, colors.black)
+        recv_window.blit(via_callsigns, colors.lightBlue, colors.black)
+    end
+
+    recv_window.blit("] ", colors.lightGray, colors.black)
+    recv_window.blit(message, colors.white, colors.black)
+end
+
 function send_task()
     while (true) do
-        local message = io.read()
         send_window.clear()
         send_window.setCursorPos(1, 1)
+        send_window.blit("> ", colors.lightGray, colors.black)
+        send_window.setTextColor(colors.white)
+        local message = io.read()
 
         if message == "exit" then
             return
@@ -28,14 +47,7 @@ function send_task()
         rednet.broadcast(output_message, "mesh")
 
         -- manually print this message ourselves
-        local display_message = string.format("[%s] %s", callsign, message)
-
-        local old = term.redirect(recv_window)
-        print(display_message)
-        term.redirect(old)
-        if old.restoreCursor then
-            old.restoreCursor()
-        end
+        print_message(callsign, message)
     end
 end
 
@@ -56,15 +68,15 @@ function recv_task()
             local output_message = string.format("[%04x %s %s] %s", message_id, callsign_history, callsign, sender_message)
             rednet.broadcast(output_message, "mesh")
 
-            -- print message to terminal
-            local display_message = string.format("[%s] %s", callsign_history, sender_message)
-
-            local old = term.redirect(recv_window)
-            print(display_message)
-            term.redirect(old)
-            if old.restoreCursor then
-                old.restoreCursor()
+            -- handle special messages
+            if sender_message == "/ping" then
+                local sender_callsign = callsign_history:match("(%S+)%s.*")
+                local response_message = string.format("[%04x %s] Ping response to %s: Message arrived via %s", message_id, callsign, sender_callsign, callsign_history)
+                rednet.send(sender, response_message, "mesh")
             end
+
+            -- print message to terminal
+            print_message(callsign_history, sender_message)
         end
     end
 end

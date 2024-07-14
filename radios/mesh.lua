@@ -1,6 +1,6 @@
 callsign = "K9BRQ"
 
-local modem = rednet.open("back")
+rednet.open("back")
 local width, height = term.getSize()
 
 local header_window = window.create(term.current(), 1, 1, width, 1)

@@ -1,31 +1,31 @@
 callsign = "K9BRQ"
 
-w, h = term.getSize()
+local width, height = term.getSize()
 
-s_win = window.create(term.current(), 1, 1, w, 9)
-r_win = window.create(term.current(), 1, 11, w, h-11)
+local send_window = window.create(term.current(), 1, 1, width, 9)
+local recv_window = window.create(term.current(), 1, 11, width, height - 11)
 
 
-m = rednet.open("back")
+local modem = rednet.open("back")
 
-function send()
+function send_task()
     while (true) do
-        msg = io.read()
+        local message = io.read()
 
-        if msg == "exit" then
+        if message == "exit" then
             return
         end
 
-        rednet.broadcast("[" .. callsign .. "] " .. msg, "repeater_in")
+        rednet.broadcast("[" .. callsign .. "] " .. message, "repeater_in")
     end
 end
 
-function recv()
+function recv_task()
     while (true) do
-        s, m, p = rednet.receive("repeater_out")
-    
-        local old = term.redirect(r_win)
-        print(m)
+        local sender, message, protocol = rednet.receive("repeater_out")
+
+        local old = term.redirect(recv_window)
+        print(message)
         term.redirect(old)
         if old.restoreCursor then
             old.restoreCursor()
@@ -33,8 +33,8 @@ function recv()
     end
 end
 
-local old = term.redirect(s_win)
+local old = term.redirect(send_window)
 
-parallel.waitForAny(send, recv)
+parallel.waitForAny(send_task, recv_task)
 
 term.redirect(old)

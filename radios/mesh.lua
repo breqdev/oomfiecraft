@@ -14,10 +14,13 @@ function print_message(callsigns, message)
 
     local old = term.redirect(recv_window)
 
-    -- print message
     recv_window.setTextColor(colors.lightGray)
     recv_window.write("[")
-    recv_window.setTextColor(colors.orange)
+    if sender_callsign == callsign then
+        recv_window.setTextColor(colors.magenta)
+    else
+        recv_window.setTextColor(colors.orange)
+    end
     recv_window.write(sender_callsign)
 
     if via_callsigns ~= "" then
@@ -31,6 +34,7 @@ function print_message(callsigns, message)
     recv_window.write("] ")
     recv_window.setTextColor(colors.white)
     recv_window.write(message)
+    recv_window.write("\n")
 
     term.redirect(old)
 end

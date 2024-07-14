@@ -10,7 +10,9 @@ local known_messages = {}
 
 function print_message(callsigns, message)
     -- separate callsign history into first, rest
-    local sender_callsign, via_callsigns = callsigns:match("(%S+)%s(.*)")
+    local sender_callsign, via_callsigns = callsigns:match("^(%S+)%s?(.*)$")
+
+    local old = term.redirect(recv_window)
 
     -- print message
     recv_window.setTextColor(colors.lightGray)
@@ -29,6 +31,8 @@ function print_message(callsigns, message)
     recv_window.write("] ")
     recv_window.setTextColor(colors.white)
     recv_window.write(message)
+
+    term.redirect(old)
 end
 
 function send_task()

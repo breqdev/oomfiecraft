@@ -13,23 +13,30 @@ function print_message(callsigns, message)
     local sender_callsign, via_callsigns = callsigns:match("(%S+)%s(.*)")
 
     -- print message
-    recv_window.blit("[", colors.lightGray, colors.black)
-    recv_window.blit(sender_callsign, colors.orange, colors.black)
+    recv_window.setTextColor(colors.lightGray)
+    recv_window.write("[")
+    recv_window.setTextColor(colors.orange)
+    recv_window.write(sender_callsign)
 
     if via_callsigns ~= "" then
-        recv_window.blit(" via ", colors.lightGray, colors.black)
-        recv_window.blit(via_callsigns, colors.lightBlue, colors.black)
+        recv_window.setTextColor(colors.lightGray)
+        recv_window.write(" via ")
+        recv_window.setTextColor(colors.lightBlue)
+        recv_window.write(via_callsigns)
     end
 
-    recv_window.blit("] ", colors.lightGray, colors.black)
-    recv_window.blit(message, colors.white, colors.black)
+    recv_window.setTextColor(colors.lightGray)
+    recv_window.write("] ")
+    recv_window.setTextColor(colors.white)
+    recv_window.write(message)
 end
 
 function send_task()
     while (true) do
         send_window.clear()
         send_window.setCursorPos(1, 1)
-        send_window.blit("> ", colors.lightGray, colors.black)
+        recv_window.setTextColor(colors.lightGray)
+        send_window.write("> ")
         send_window.setTextColor(colors.white)
         local message = io.read()
 

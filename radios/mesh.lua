@@ -3,7 +3,7 @@ callsign = "K9BRQ"
 local modem = rednet.open("back")
 local width, height = term.getSize()
 
-local recv_window = window.create(term.current(), 1, 1, width, height - 5)
+local recv_window = window.create(term.current(), 1, 1, width, height - 3)
 local send_window = window.create(term.current(), 1, height - 3, width, height - 3)
 
 local known_messages = {}
@@ -43,6 +43,7 @@ function recv_task()
         local sender, message, protocol = rednet.receive("mesh")
 
         local message_id, callsign_history, sender_message = message:match("%[(%x%x%x%x) (.-)%]%s(.*)")
+        message_id = tonumber(message_id, 16)
 
         if known_messages[message_id] then
            -- nothing to do, already printed/forwarded

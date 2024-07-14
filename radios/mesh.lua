@@ -12,6 +12,7 @@ function send_task()
     while (true) do
         local message = io.read()
         send_window.clear()
+        send_window.setCursorPos(1, 1)
 
         if message == "exit" then
             return

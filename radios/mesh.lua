@@ -3,14 +3,15 @@ callsign = "K9BRQ"
 local modem = rednet.open("back")
 local width, height = term.getSize()
 
-local send_window = window.create(term.current(), 1, 1, width, 9)
-local recv_window = window.create(term.current(), 1, 11, width, height - 11)
+local recv_window = window.create(term.current(), 1, 1, width, height - 5)
+local send_window = window.create(term.current(), 1, height - 3, width, height - 3)
 
 local known_messages = {}
 
 function send_task()
     while (true) do
         local message = io.read()
+        send_window.clear()
 
         if message == "exit" then
             return
@@ -26,8 +27,10 @@ function send_task()
         rednet.broadcast(output_message, "mesh")
 
         -- manually print this message ourselves
+        local display_message = string.format("[%s] %s", callsign, message)
+
         local old = term.redirect(recv_window)
-        print(message)
+        print(display_message)
         term.redirect(old)
         if old.restoreCursor then
             old.restoreCursor()
@@ -39,7 +42,7 @@ function recv_task()
     while (true) do
         local sender, message, protocol = rednet.receive("mesh")
 
-        local message_id, callsign_history, sender_message = original_message:match("%[(%x%x%x%x) (.-)%]%s(.*)")
+        local message_id, callsign_history, sender_message = message:match("%[(%x%x%x%x) (.-)%]%s(.*)")
 
         if known_messages[message_id] then
            -- nothing to do, already printed/forwarded
@@ -52,8 +55,10 @@ function recv_task()
             rednet.broadcast(output_message, "mesh")
 
             -- print message to terminal
+            local display_message = string.format("[%s] %s", callsign_history, sender_message)
+
             local old = term.redirect(recv_window)
-            print(message)
+            print(display_message)
             term.redirect(old)
             if old.restoreCursor then
                 old.restoreCursor()
